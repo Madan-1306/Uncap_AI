@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Fact Checker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 YouTube Fact Checker</h1>
+            <p>Analyze YouTube videos for misconceptions and fact-check claims against official sources</p>
+        </div>
+
+        <div class="input-section">
+            <div class="url-input-container">
+                <input 
+                    type="url" 
+                    id="youtubeUrl" 
+                    placeholder="Paste YouTube URL here (e.g., https://www.youtube.com/watch?v=dQw4w9WgXcQ)"
+                    required
+                >
+                <button class="analyze-btn" id="analyzeBtn">Analyze Video</button>
+            </div>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Analyzing video and checking facts...</p>
+            </div>
+
+            <div class="error-message" id="errorMessage"></div>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <div class="video-info" id="videoInfo">
+                <!-- Video information will be populated here -->
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" data-tab="transcript">📝 Transcript</button>
+                <button class="tab" data-tab="misconceptions">⚠️ Misconceptions</button>
+                <button class="tab" data-tab="summary">📊 Summary</button>
+            </div>
+
+            <div class="tab-content active" id="transcript-content">
+                <div class="transcript-section" id="transcriptContainer">
+                    <!-- Transcript will be populated here -->
+                </div>
+            </div>
+
+            <div class="tab-content" id="misconceptions-content">
+                <div class="misconceptions-list" id="misconceptionsList">
+                    <!-- Misconceptions will be populated here -->
+                </div>
+            </div>
+
+            <div class="tab-content" id="summary-content">
+                <div id="summaryContainer">
+                    <!-- Summary will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
