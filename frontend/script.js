@@ -1,24 +1,21 @@
-/**
- * YouTube Fact Checker - Frontend
- * - Extracts YouTube video ID from URL
- * - Fetches transcript using YouTube Transcript API (via backend)
- * - Sends transcript lines to backend (Intel Guard)
- * - Displays misconceptions in UI
- */
 class YouTubeFactChecker {
     constructor() {
-        this.apiBaseUrl = "http://localhost:8000"; // Flask backend
+        this.apiBaseUrl = 'http://localhost:8000';
         this.initializeEventListeners();
     }
 
     initializeEventListeners() {
-        const analyzeBtn = document.getElementById("analyzeBtn");
-        const urlInput = document.getElementById("youtubeUrl");
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const urlInput = document.getElementById('youtubeUrl');
+        const tabs = document.querySelectorAll('.tab');
 
-        analyzeBtn.addEventListener("click", () => this.analyzeVideo());
+        analyzeBtn.addEventListener('click', () => this.analyzeVideo());
+        urlInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.analyzeVideo();
+        });
 
-        urlInput.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") this.analyzeVideo();
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => this.switchTab(tab.dataset.tab));
         });
     }
 
@@ -29,36 +26,35 @@ class YouTubeFactChecker {
     }
 
     showError(message) {
-        const errorDiv = document.getElementById("errorMessage");
+        const errorDiv = document.getElementById('errorMessage');
         errorDiv.textContent = message;
-        errorDiv.style.display = "block";
+        errorDiv.style.display = 'block';
     }
 
     hideError() {
-        document.getElementById("errorMessage").style.display = "none";
+        document.getElementById('errorMessage').style.display = 'none';
     }
 
     showLoading() {
-        document.getElementById("loading").style.display = "block";
-        document.getElementById("analyzeBtn").disabled = true;
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('analyzeBtn').disabled = true;
     }
 
     hideLoading() {
-        document.getElementById("loading").style.display = "none";
-        document.getElementById("analyzeBtn").disabled = false;
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('analyzeBtn').disabled = false;
     }
 
     async analyzeVideo() {
-        const url = document.getElementById("youtubeUrl").value.trim();
-
+        const url = document.getElementById('youtubeUrl').value.trim();
         if (!url) {
-            this.showError("Please enter a YouTube URL");
+            this.showError('Please enter a YouTube URL');
             return;
         }
 
         const videoId = this.extractVideoId(url);
         if (!videoId) {
-            this.showError("Please enter a valid YouTube URL");
+            this.showError('Please enter a valid YouTube URL');
             return;
         }
 
@@ -66,24 +62,21 @@ class YouTubeFactChecker {
         this.showLoading();
 
         try {
-            // Ask backend to fetch transcript and analyze
-            const response = await fetch(`${this.apiBaseUrl}/analyze_video`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ video_id: videoId }),
+            const response = await fetch(`${this.apiBaseUrl}/analyze`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url })
             });
 
-            if (!response.ok) throw new Error("Backend error");
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
             const data = await response.json();
-
-            console.log("🔍 Analysis Results:", data);
-
             this.displayResults(data);
-            document.getElementById("resultsSection").style.display = "block";
+            document.getElementById('resultsSection').style.display = 'block';
+
         } catch (error) {
-            console.error("Analysis failed:", error);
-            this.showError("Analysis failed. Please try again later.");
+            console.error('Analysis failed:', error);
+            this.showError('Analysis failed. Please try again later.');
         } finally {
             this.hideLoading();
         }
@@ -92,72 +85,59 @@ class YouTubeFactChecker {
     displayResults(data) {
         this.displayTranscript(data.transcript);
         this.displayMisconceptions(data.misconceptions);
-        this.displaySummary(data.summary);
     }
 
     displayTranscript(transcript) {
-        const container = document.getElementById("transcriptContainer");
-        container.innerHTML = transcript
-            .map(
-                (line) => `
-            <div class="transcript-line ${
-                line.hasMisconception ? "has-misconception" : ""
-            }">
-                <div class="timestamp">${line.timestamp}</div>
+        const container = document.getElementById('transcriptContainer');
+        container.innerHTML = transcript.map(line => `
+            <div class="transcript-line ${line.misinformation === 'MISINFORMATION' ? 'has-misconception' : ''}">
+                <div class="timestamp">${this.formatTime(line.timestamp)}</div>
                 <div class="text">
                     ${line.text}
-                    ${
-                        line.hasMisconception
-                            ? '<span class="misconception-badge">⚠️ Misconception</span>'
-                            : ""
-                    }
+                    ${line.misinformation === 'MISINFORMATION' ? '<span class="misconception-badge">Potential Misconception</span>' : ''}
                 </div>
             </div>
-        `
-            )
-            .join("");
+        `).join('');
     }
 
     displayMisconceptions(misconceptions) {
-        const container = document.getElementById("misconceptionsList");
+        const container = document.getElementById('misconceptionsList');
 
-        if (!misconceptions || misconceptions.length === 0) {
-            container.innerHTML =
-                '<p style="text-align: center; color: green;">🎉 No misconceptions detected!</p>';
+        if (misconceptions.length === 0) {
+            container.innerHTML = '<p style="text-align: center; color: #38a169; font-size: 1.1rem;">🎉 No misconceptions detected!</p>';
             return;
         }
 
-        container.innerHTML = misconceptions
-            .map(
-                (item) => `
+        container.innerHTML = misconceptions.map(item => `
             <div class="misconception-item">
                 <div class="misconception-header">
-                    <span class="severity-badge severity-${item.severity}">
-                        ${item.severity.toUpperCase()}
-                    </span>
-                    <span class="confidence">Confidence: ${(item.confidence * 100).toFixed(1)}%</span>
+                    <span class="severity-badge severity-high">HIGH</span>
+                    <span class="timestamp">At ${this.formatTime(item.timestamp)}</span>
                 </div>
-                <div class="misconception-claim">Claim: "${item.text}"</div>
+                <div class="misconception-claim">${item.text}</div>
+                <div class="fact-check">
+                    <div class="fact-check-header">⚠️ Predicted as Misinformation</div>
+                    <p>Confidence: ${(item.score * 100).toFixed(2)}%</p>
+                </div>
             </div>
-        `
-            )
-            .join("");
+        `).join('');
     }
 
-    displaySummary(summary) {
-        const container = document.getElementById("summaryContainer");
-        container.innerHTML = `
-            <h3>📊 Analysis Summary</h3>
-            <p>Total Misconceptions: ${summary.totalMisconceptions}</p>
-            <p>High Severity: ${summary.highSeverity}</p>
-            <p>Medium Severity: ${summary.mediumSeverity}</p>
-            <p>Low Severity: ${summary.lowSeverity}</p>
-            <h4>Overall Rating: ${summary.overallRating}</h4>
-            <p>${summary.recommendation}</p>
-        `;
+    switchTab(tabName) {
+        document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+        document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+        document.getElementById(`${tabName}-content`).classList.add('active');
+    }
+
+    formatTime(seconds) {
+        const min = Math.floor(seconds / 60);
+        const sec = Math.floor(seconds % 60).toString().padStart(2, '0');
+        return `${min}:${sec}`;
     }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener('DOMContentLoaded', () => {
     new YouTubeFactChecker();
 });

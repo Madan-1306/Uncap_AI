@@ -1,0 +1,61 @@
+/* Highlight transcript lines with misinformation */
+.transcript-line.has-misconception {
+    background-color: #fff0f0;
+    border-left: 5px solid #f56565;
+    padding: 12px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.transcript-line.has-misconception:hover {
+    transform: translateX(2px);
+    box-shadow: 0 4px 12px rgba(245, 101, 101, 0.3);
+}
+
+/* Misconception badge */
+.misconception-badge {
+    background-color: #f56565;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.8rem;
+    padding: 3px 8px;
+    border-radius: 12px;
+    margin-left: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    display: inline-block;
+}
+
+/* Misconception items in the tab */
+.misconception-item {
+    background-color: #fff5f5;
+    border: 1px solid #fed7d7;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.misconception-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(245, 101, 101, 0.3);
+}
+
+/* Fact-check section inside misconception items */
+.fact-check {
+    background-color: #fff0f0;
+    border-left: 4px solid #f56565;
+    padding: 10px 15px;
+    margin-top: 10px;
+    border-radius: 8px;
+}
+
+.fact-check-header {
+    font-weight: 600;
+    color: #c53030;
+    margin-bottom: 5px;
+}
+
+/* Confidence percentage */
+.fact-check p {
+    font-size: 0.9rem;
+    color: #742a2a;
+}
