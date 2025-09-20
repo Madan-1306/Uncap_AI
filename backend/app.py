@@ -1,89 +1,117 @@
 from flask import Flask, request, jsonify
-from youtube_transcript_api import YouTubeTranscriptApi
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from flask_cors import CORS
+from youtube_transcript_api import YouTubeTranscriptApi, NoTranscriptFound, VideoUnavailable, TranscriptsDisabled
+from transformers import AutoTokenizer, AutoModelForSequenceClassification, logging as hf_logging
 import torch
+import traceback
+import re
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.DEBUG)
+hf_logging.set_verbosity_info()  # Hugging Face logging
 
 app = Flask(__name__)
+CORS(app, resources={r"/analyze": {"origins": "*"}})
 
-# -----------------------------
-# Load BERT fake news detection model
-# -----------------------------
+# Load BERT model (force main branch)
 MODEL_NAME = "mrm8488/bert-tiny-finetuned-fake-news-detection"
-tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
+tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, revision="main")
+model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME, revision="main")
 
-# -----------------------------
 # Helper functions
-# -----------------------------
 def analyze_line(text):
-    """
-    Analyze a single line of transcript for fake news / real info
-    """
+    """Analyze a single line of transcript for fake news / real info"""
     inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True)
     with torch.no_grad():
         outputs = model(**inputs)
     probs = torch.softmax(outputs.logits, dim=1)
     labels = ["REAL", "FAKE"]
-    return {"label": labels[torch.argmax(probs)], "score": torch.max(probs).item()}
+    misinfo_label = "MISINFORMATION" if labels[torch.argmax(probs)] == "FAKE" else "REAL"
+    return {"label": misinfo_label, "score": torch.max(probs).item()}
 
 def extract_video_id(url):
-    """
-    Extract YouTube video ID from URL
-    """
-    if "v=" in url:
-        return url.split("v=")[1].split("&")[0]
-    elif "youtu.be/" in url:
-        return url.split("youtu.be/")[1].split("?")[0]
-    else:
-        return None
+    """Extract YouTube video ID from URL"""
+    patterns = [
+        r'(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/shorts\/)([^"&?\/\s]{11})'
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, url)
+        if match:
+            return match.group(1)
+    return None
 
-# -----------------------------
 # Routes
-# -----------------------------
 @app.route('/analyze', methods=['POST'])
 def analyze_video():
-    data = request.json
-    video_url = data.get("url")
+    try:
+        data = request.json
+        if not data:
+            return jsonify({"error": "Empty request body"}), 400
+        video_url = data.get("url")
+        logging.debug(f"Received video URL: {video_url}")
+    except ValueError:
+        return jsonify({"error": "Invalid JSON format"}), 400
 
     if not video_url:
         return jsonify({"error": "No URL provided"}), 400
 
     video_id = extract_video_id(video_url)
+    logging.debug(f"Extracted video ID: {video_id}")
     if not video_id:
         return jsonify({"error": "Invalid YouTube URL"}), 400
 
+    # Fetch transcript
+    transcript = None
     try:
-        # Fetch transcript
-        transcript = YouTubeTranscriptApi.get_transcript(video_id)
-    except Exception as e:
-        return jsonify({"error": f"Could not fetch transcript: {str(e)}"}), 500
+        ytt_api = YouTubeTranscriptApi()
+        transcript_list = ytt_api.list(video_id)  # returns TranscriptList object
 
-    # Analyze each transcript line
+        for t in transcript_list:
+            try:
+                transcript = t.fetch()  # FetchedTranscript object
+                logging.debug(f"Using transcript in language: {t.language_code}")
+                break
+            except Exception as e:
+                logging.warning(f"Failed to fetch transcript for language {t.language_code}: {e}")
+                continue
+
+        if not transcript:
+            return jsonify({"error": "No valid transcript found for any language."}), 400
+
+    except NoTranscriptFound:
+        return jsonify({"error": "No transcript found for this video."}), 400
+    except VideoUnavailable:
+        return jsonify({"error": "Video is unavailable or private."}), 400
+    except TranscriptsDisabled:
+        return jsonify({"error": "Transcripts are disabled for this video."}), 400
+    except Exception as e:
+        logging.error(f"Unexpected error for video ID {video_id}: {e}")
+        traceback.print_exc()
+        return jsonify({"error": f"Failed to fetch transcript: {str(e)}"}), 500
+
+    # Analyze transcript
     analyzed_transcript = []
     misconceptions = []
-    for line in transcript:
-        analysis = analyze_line(line["text"])
+    for snippet in transcript:  # FetchedTranscriptSnippet objects
+        text = snippet.text
+        start = snippet.start
+        analysis = analyze_line(text)
         line_data = {
-            "timestamp": line["start"],  # start time in seconds
-            "text": line["text"],
+            "timestamp": start,
+            "text": text,
             "misinformation": analysis["label"],
             "score": analysis["score"]
         }
         analyzed_transcript.append(line_data)
-
-        # If line is FAKE, store in separate list
-        if analysis["label"] == "FAKE":
+        if analysis["label"] == "MISINFORMATION":
             misconceptions.append(line_data)
 
-    # Return JSON
     return jsonify({
         "video_url": video_url,
         "transcript": analyzed_transcript,
         "misconceptions": misconceptions
     })
 
-# -----------------------------
-# Main
-# -----------------------------
 if __name__ == '__main__':
-    app.run(debug=True, port=8000)
+    app.run(debug=True, port=8001, host='0.0.0.0')
