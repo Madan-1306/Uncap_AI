@@ -1,6 +1,6 @@
 class YouTubeFactChecker {
     constructor() {
-        this.apiBaseUrl = 'http://localhost:8000';
+        this.apiBaseUrl = 'http://127.0.0.1:8001';
         this.initializeEventListeners();
     }
 
@@ -20,7 +20,7 @@ class YouTubeFactChecker {
     }
 
     extractVideoId(url) {
-        const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+        const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/shorts\/)([^"&?\/\s]{11})/;
         const match = url.match(regex);
         return match ? match[1] : null;
     }
@@ -68,15 +68,18 @@ class YouTubeFactChecker {
                 body: JSON.stringify({ url })
             });
 
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
             const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || `HTTP error! status: ${response.status}`);
+            }
+
             this.displayResults(data);
             document.getElementById('resultsSection').style.display = 'block';
 
         } catch (error) {
             console.error('Analysis failed:', error);
-            this.showError('Analysis failed. Please try again later.');
+            this.showError(error.message || 'Analysis failed. Please try again later.');
         } finally {
             this.hideLoading();
         }
