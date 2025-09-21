@@ -1,92 +1,148 @@
-🧠 Misconception Detector AI
+🧠 Uncap - Misconception Detector AI
 
 A Gen AI system that detects misconceptions, fake facts, or misleading claims in YouTube / social media videos by analyzing transcripts and cross-verifying them with trusted knowledge sources using RAG (Retrieval-Augmented Generation).
----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-🚀 Project Overview
+With the explosion of online educational videos on YouTube, Instagram, and TikTok, learners often encounter misleading or partially incorrect content. Uncap is designed to detect misinformation specifically in educational and factual videos, helping students, teachers, and researchers verify learning material.
 
-With the rise of deepfakes, misinformation, and pseudoscience on platforms like YouTube and Instagram, people often struggle to know whether the information they consume is true or misleading.
+🎯 Goal: Ensure educational content and factual videos are trustworthy, improving media literacy and critical thinking.
 
-Misconception Detector AI aims to solve this problem by:
+The Story Behind Uncap 📖
 
-Extracting video transcripts (via APIs or caption files).
+We noticed:
 
-Using a Gen AI model + RAG pipeline to check claims against trusted sources (Wikipedia, scientific articles, news, etc.).
+Even educational videos sometimes contain misleading facts or outdated information, and existing tools either focus on general text content or pre-recorded videos, without providing real-time snippet-wise analysis.
 
-Returning a fact-check report with labels like:
+Uncap fills this gap by:
 
-✅ Correct
+Fetching video transcripts (captions)
 
-⚠️ Misleading / Partially true
+Analyzing each snippet for truthfulness as the video plays
 
-❌ Incorrect / Fake fact
+Classifying snippets as:
 
----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+❌ MISINFORMATION
 
-🛠️ Tech Stack
+⚠️ UNCERTAIN
 
-Frontend: Streamlit / React (for demo UI)
+✅ REAL
 
-Backend: Python (FastAPI / Flask)
+Optionally providing corrective references (demo only)
 
-LLM: OpenAI GPT / Llama-2 / Gemini
+Summarizing misinformation patterns in the video
 
-RAG Layer:
+🔍 Key Insight: While other software focuses on offline text or static video analysis, Uncap provides real-time fact-checking for educational video streams.
 
-Vector DB (FAISS / Pinecone / Weaviate)
+Why Uncap is Unique 🌟
 
-Document sources: Wikipedia API, scientific datasets, news archives
+Real-Time Detection: Snippet-wise classification while the video plays.
 
-Video Transcript Extraction:
+Educational Focus: Tailored for learning/factual videos, not general entertainment.
 
-YouTube API / Whisper AI (for speech-to-text)
+Corrective References: Shows possible factual corrections (demo).
 
-Deployment: Docker + Cloud (GCP / AWS / HuggingFace Spaces)
+Prototype Workflow: Demonstrates a real-time video fact-checking system for educational content.
 
----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Fine-Tuning Ready: Can be trained for specific educational domains like science, history, or technology.
 
-🔎 Workflow
+How It Works ⚙️
 
-Input: YouTube video link / uploaded video.
+Input Video URL: YouTube (future: Instagram/TikTok educational videos).
 
-Transcript Generation: Extract speech → convert to text.
+Fetch Transcript: Using video captions.
 
-Claim Segmentation: Break transcript into atomic claims (facts/arguments).
+Analyze Each Snippet:
 
-Verification with RAG:
+Output: ❌ MISINFORMATION | ⚠️ UNCERTAIN | ✅ REAL
 
-Retrieve supporting docs from trusted sources.
+Corrective Fact Retrieval: (Demo using online references)
 
-LLM evaluates if the claim is ✅ correct, ⚠️ partially true, or ❌ false.
+Summary Generation:
 
-Output: Display results as fact-check report with confidence scores.
+Total snippets analyzed
 
----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Number of misinformation snippets
 
-📊 Example Output
+List of corrective facts and sources
 
-Video Claim: "Humans use only 10% of their brain."
+⚠️ Prototype Note: Processing long videos may take time, and demo references are not guaranteed accurate. This is a demo of workflow, not a production-grade system.
 
-🔍 Retrieved Evidence: Neuroscience research (PubMed, Wikipedia).
+Tech Stack 🛠️
 
-✅ Fact-Check Result: ❌ False – humans use almost all parts of their brain, even when resting.
+Python 3.13 – Programming language
 
-🔗 Sources: Wikipedia
-, [PubMed]
+Flask + Flask-CORS – Backend API
 
----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+PyTorch + Transformers – AI inference (demo model)
 
-💡 Future Enhancements
+YouTube Transcript API – Captions for analysis
 
-Real-time browser extension for YouTube/Instagram.
+Demo Knowledge References – Wikipedia (placeholder for real fact-checking)
 
-Multi-language support for global content.
+Limitations & Considerations ⚠️
 
-Integration with Content Credentials to flag AI-generated videos.
+Time-Consuming: Long videos may take several minutes.
 
----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Prototype Stage: Results may be irrelevant or partial.
 
-🌍 Impact
+References Demo: Only for demonstration, not verified facts.
+
+Domain-Specific Accuracy: Requires fine-tuning for educational subjects.
+
+🔧 Future Improvements:
+
+Real-time Instagram/TikTok educational content support
+
+Fine-tuned models for specific educational domains
+
+Visual dashboards showing misinformation trends
+
+Integration with trusted educational databases
+
+Enhanced student/teacher learning tools
+
+Intended Use 🎓
+
+Uncap is designed to:
+
+Detect misinformation in educational videos
+
+Help learners verify facts in science, history, and other subjects
+
+Provide a demo workflow for real-time educational video fact-checking
+
+❗ Important: This is not a production system. The prototype is for research and educational video verification purposes only.
+
+Installation & Usage 🚀
+
+Clone the repository:
+
+git clone https://github.com/yourusername/uncap.git
+cd uncap
+
+
+Install dependencies:
+
+pip install -r requirements.txt
+
+
+Run Flask App:
+
+python app.py
+
+
+Analyze a Video: POST a YouTube URL to /analyze endpoint and receive JSON output.
+
+Acknowledgements 🙏
+
+Existing AI text-classification models and libraries inspired this prototype workflow
+
+YouTube Transcript API – Captions for video analysis
+
+Flask & PyTorch – Backend and AI inference engine
+
+Wikipedia – Demo corrective facts
+
+🌟 Uncap demonstrates real-time educational video fact-checking workflow for research, learning, and demo purposes.
 
 Helps users separate facts from fiction, fighting misinformation in education, science, health, and news.
 
