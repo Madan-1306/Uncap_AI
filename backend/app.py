@@ -15,9 +15,18 @@ app = Flask(__name__)
 CORS(app, resources={r"/analyze": {"origins": "*"}})
 
 # Load BERT model (force main branch)
-MODEL_NAME = "mrm8488/bert-tiny-finetuned-fake-news-detection"
+MODEL_NAME = "mariagrandury/roberta-base-finetuned-sms-spam-detection"
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, revision="main")
 model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME, revision="main")
+
+label_map = {
+    0: "pants-fire",
+    1: "false",
+    2: "barely-true",
+    3: "half-true",
+    4: "mostly-true",
+    5: "true"
+}
 
 # Helper functions
 def analyze_line(text):
@@ -26,9 +35,19 @@ def analyze_line(text):
     with torch.no_grad():
         outputs = model(**inputs)
     probs = torch.softmax(outputs.logits, dim=1)
-    labels = ["REAL", "FAKE"]
-    misinfo_label = "MISINFORMATION" if labels[torch.argmax(probs)] == "FAKE" else "REAL"
-    return {"label": misinfo_label, "score": torch.max(probs).item()}
+    pred_id = torch.argmax(probs).item()
+    label = label_map[pred_id]
+    confidence = torch.max(probs).item()
+
+    # Group into your UI labels
+    if label in ["true", "mostly-true"]:
+        misinfo_label = "REAL"
+    elif label in ["half-true", "barely-true"]:
+        misinfo_label = "UNCERTAIN"
+    else:  # false, pants-fire
+        misinfo_label = "MISINFORMATION"
+
+    return {"label": misinfo_label, "raw_label": label, "score": confidence}
 
 def extract_video_id(url):
     """Extract YouTube video ID from URL"""
