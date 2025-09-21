@@ -97,7 +97,10 @@ class YouTubeFactChecker {
                 <div class="timestamp">${this.formatTime(line.timestamp)}</div>
                 <div class="text">
                     ${line.text}
-                    ${line.misinformation === 'MISINFORMATION' ? '<span class="misconception-badge">Potential Misconception</span>' : ''}
+                    ${line.misinformation === 'MISINFORMATION' ? '<span class="misconception-badge">❌ Misinformation</span>' : line.misinformation === 'UNCERTAIN' 
+        ? '<span class="uncertain-badge">⚠️ Uncertain</span>' 
+        : '<span class="real-badge">✅ Real</span>'}
+
                 </div>
             </div>
         `).join('');
