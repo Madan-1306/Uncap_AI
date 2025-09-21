@@ -1,14 +1,14 @@
 🧠 Uncap - Misconception Detector AI
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 A Gen AI system that detects misconceptions, fake facts, or misleading claims in YouTube / social media videos by analyzing transcripts and cross-verifying them with trusted knowledge sources using RAG (Retrieval-Augmented Generation).
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 With the explosion of online educational videos on YouTube, Instagram, and TikTok, learners often encounter misleading or partially incorrect content. Uncap is designed to detect misinformation specifically in educational and factual videos, helping students, teachers, and researchers verify learning material.
 
 🎯 Goal: Ensure educational content and factual videos are trustworthy, improving media literacy and critical thinking.
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 The Story Behind Uncap 📖
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 We noticed:
 
@@ -33,9 +33,9 @@ Optionally providing corrective references (demo only)
 Summarizing misinformation patterns in the video
 
 🔍 Key Insight: While other software focuses on offline text or static video analysis, Uncap provides real-time fact-checking for educational video streams.
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Why Uncap is Unique 🌟
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Real-Time Detection: Snippet-wise classification while the video plays.
 
@@ -46,9 +46,9 @@ Corrective References: Shows possible factual corrections (demo).
 Prototype Workflow: Demonstrates a real-time video fact-checking system for educational content.
 
 Fine-Tuning Ready: Can be trained for specific educational domains like science, history, or technology.
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 How It Works ⚙️
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Input Video URL: YouTube (future: Instagram/TikTok educational videos).
 
@@ -69,9 +69,9 @@ Number of misinformation snippets
 List of corrective facts and sources
 
 ⚠️ Prototype Note: Processing long videos may take time, and demo references are not guaranteed accurate. This is a demo of workflow, not a production-grade system.
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Tech Stack 🛠️
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Python 3.13 – Programming language
 
@@ -82,9 +82,9 @@ PyTorch + Transformers – AI inference (demo model)
 YouTube Transcript API – Captions for analysis
 
 Demo Knowledge References – Wikipedia (placeholder for real fact-checking)
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Limitations & Considerations ⚠️
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Time-Consuming: Long videos may take several minutes.
 
@@ -93,9 +93,9 @@ Prototype Stage: Results may be irrelevant or partial.
 References Demo: Only for demonstration, not verified facts.
 
 Domain-Specific Accuracy: Requires fine-tuning for educational subjects.
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 🔧 Future Improvements:
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Real-time Instagram/TikTok educational content support
 
@@ -106,9 +106,9 @@ Visual dashboards showing misinformation trends
 Integration with trusted educational databases
 
 Enhanced student/teacher learning tools
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Intended Use 🎓
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Uncap is designed to:
 
@@ -116,10 +116,10 @@ Detect misinformation in educational videos
 
 Help learners verify facts in science, history, and other subjects
 
-Provide a demo workflow for real-time educational video fact-checking
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Provide a demo workflow for real-time educational video fact-checking-
 
 Installation & Usage 🚀
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Clone the repository:
 
@@ -138,9 +138,9 @@ python app.py
 
 
 Analyze a Video: POST a YouTube URL to /analyze endpoint and receive JSON output.
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Acknowledgements 🙏
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Existing AI text-classification models and libraries inspired this prototype workflow
 
@@ -149,8 +149,7 @@ YouTube Transcript API – Captions for video analysis
 Flask & PyTorch – Backend and AI inference engine
 
 Wikipedia – Demo corrective facts
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-🌟 Uncap demonstrates real-time educational video fact-checking workflow for research, learning, and demo purposes.
 
 Helps users separate facts from fiction, fighting misinformation in education, science, health, and news.
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
