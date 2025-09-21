@@ -3,3 +3,5 @@ flask-cors
 torch
 transformers
 youtube-transcript-api
+wikipedia
+gunicorn
