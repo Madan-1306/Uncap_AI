@@ -343,3 +343,20 @@ body {
         font-size: 14px;
     }
 }
+/* Correct Fact Styles */
+.correct-fact {
+    font-size: 0.9rem;
+    color: #2b6cb0; /* blue for facts */
+    margin-top: 4px;
+}
+
+.correct-fact a {
+    color: #2b6cb0;
+    text-decoration: underline;
+    margin-left: 5px;
+}
+
+.correct-fact a:hover {
+    text-decoration: none;
+    font-weight: 600;
+}

@@ -88,6 +88,21 @@ class YouTubeFactChecker {
     displayResults(data) {
         this.displayTranscript(data.transcript);
         this.displayMisconceptions(data.misconceptions);
+        this.displaySummary(data.summary_facts);
+    }
+    
+    displaySummary(summaryData) {
+        const container = document.getElementById('summaryContainer');
+        if (!summaryData || summaryData.length === 0) {
+            container.innerHTML = '<p>No scientific facts found.</p>';
+            return;
+        }
+        container.innerHTML = summaryData.map(item => `
+            <div class="fact-item">
+                <p><strong>${item.term}</strong>: ${item.fact}</p>
+                <p class="sources">Source: <a href="${item.source}" target="_blank" class="source-link">${item.source}</a></p>
+            </div>
+        `).join('');
     }
 
     displayTranscript(transcript) {
@@ -100,7 +115,7 @@ class YouTubeFactChecker {
                     ${line.misinformation === 'MISINFORMATION' ? '<span class="misconception-badge">❌ Misinformation</span>' : line.misinformation === 'UNCERTAIN' 
         ? '<span class="uncertain-badge">⚠️ Uncertain</span>' 
         : '<span class="real-badge">✅ Real</span>'}
-
+        ${line.correct_fact ? `<div class="correct-fact">✔ Correct Fact: ${line.correct_fact} <a href="${line.source}" target="_blank">[source]</a></div>` : ''}
                 </div>
             </div>
         `).join('');
@@ -108,7 +123,6 @@ class YouTubeFactChecker {
 
     displayMisconceptions(misconceptions) {
         const container = document.getElementById('misconceptionsList');
-
         if (misconceptions.length === 0) {
             container.innerHTML = '<p style="text-align: center; color: #38a169; font-size: 1.1rem;">🎉 No misconceptions detected!</p>';
             return;
@@ -124,6 +138,7 @@ class YouTubeFactChecker {
                 <div class="fact-check">
                     <div class="fact-check-header">⚠️ Predicted as Misinformation</div>
                     <p>Confidence: ${(item.score * 100).toFixed(2)}%</p>
+                    ${item.correct_fact ? `<p>✔ Correct Fact: ${item.correct_fact} <a href="${item.source}" target="_blank">[source]</a></p>` : ''}
                 </div>
             </div>
         `).join('');
