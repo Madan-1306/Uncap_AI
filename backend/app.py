@@ -15,7 +15,7 @@ app = Flask(__name__)
 CORS(app, resources={r"/analyze": {"origins": "*"}})
 
 # ------------------ Model ------------------
-MODEL_NAME = "facebook/bart-large-mnli"
+MODEL_NAME = "typeform/distilbert-base-uncased-mnli"
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, revision="main")
 model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME, revision="main")
 
